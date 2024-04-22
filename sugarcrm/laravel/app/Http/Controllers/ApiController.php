@@ -312,6 +312,23 @@ class ApiController extends Controller
             $validated = $validator->validated(); //The id number is here: $validated['id_number']
             
             //Add code here
+            // Load the case
+            $case = \lt_case::retrieve($id);
+
+            if (empty($case->id)) {
+                throw new \Exception("Case with id `{$id}` not found!");
+            }
+
+            // Load the customer
+            $customer = \lt_customer::retrieve_by_string_fields(['id_number' => $validated['id_number']]);
+
+            if (empty($customer->id)) {
+                throw new \Exception("Customer with id number `{$validated['id_number']}` not found!");
+            }
+
+            // Link the customer to the case
+            $case->load_relationship('lt_customer');
+            $case->lt_customer->add($customer);
         }
 
         return $this->getCase($id);
@@ -347,8 +364,13 @@ SQL);
      * )
      */
     function getCustomersWithPolicyNames(Request $request) {
-        $results = [];
-        //Add code here
+        $results = DB::select(<<<SQL
+            SELECT c.last_name, c.first_name, c.id_number, GROUP_CONCAT(p.policy_name SEPARATOR ', ') as policy_names
+            FROM lt_customer c
+            LEFT JOIN lt_policy_customer pc ON c.id = pc.customer_id
+            LEFT JOIN lt_policy p ON pc.policy_id = p.id
+            GROUP BY c.id
+        SQL);
         return response()->json($results);
     }
 
@@ -363,9 +385,15 @@ SQL);
      * )
      */
     function updateHasCorrectIdNumber(Request $request) {
-
-        //Add code here
-        
+        DB::update(<<< SQL
+            UPDATE lt_customer
+            SET id_number_status = CASE 
+                WHEN id_number LIKE '% %' THEN 'uncertain'
+                WHEN LENGTH(id_number) = 13 THEN 'correct'
+                ELSE 'incorrect'
+            END
+        SQL);
         return $this->getCustomers($request);
     }
+
 }

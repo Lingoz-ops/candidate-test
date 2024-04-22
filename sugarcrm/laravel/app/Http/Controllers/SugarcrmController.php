@@ -20,10 +20,13 @@ class SugarcrmController extends Controller
 
         if ( empty($moduleName) && empty($id) && empty($view) ) {
 
-            $lastCreatedPolicyName = "";
-            $totalNumOfDecreaseCoverCases = 0;
-            $totalNumOfCancelCoverCases = 0;
 
+            $lastCreatedPolicyName = GeneralUtils::getLastCreatedPolicyName();
+            $totalNumOfIncreaseCoverCases = GeneralUtils::countIncreaseCoverCases();
+            $totalNumOfDecreaseCoverCases = GeneralUtils::countDecreaseCoverCases();
+            $totalNumOfCancelCoverCases = GeneralUtils::countCancelCoverCases();
+
+            $base->assign('totalNumOfIncreaseCoverCases', $totalNumOfIncreaseCoverCases);
             $base->assign('totalNumOfDecreaseCoverCases', $totalNumOfDecreaseCoverCases);
             $base->assign('totalNumOfCancelCoverCases', $totalNumOfCancelCoverCases);
             $base->assign('lastCreatedPolicyName', $lastCreatedPolicyName);
