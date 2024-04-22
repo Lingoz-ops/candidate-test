@@ -58,4 +58,7 @@ Route::group(['prefix'=>'api'], function() {
     Route::get("lists/customers/with-policy-names", [ApiController::class, 'getCustomersWithPolicyNames']);
     Route::put("lists/customers/update-id-number-status", [ApiController::class, 'updateHasCorrectIdNumber']);
 
+    //New API enpoint
+    Route::get("module/lt_course/courses-with-students-and-teacher", [ApiController::class, 'getCoursesWithStudentsAndTeacher']);
+
 });

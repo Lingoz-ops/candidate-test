@@ -14,7 +14,21 @@ use Illuminate\Support\Facades\Validator;
  */
 
 class ApiController extends Controller
-{   
+{
+    /**
+     * @OA\Get(
+     *     path="/api/module/lt_course/courses-with-students-and-teacher",
+     *     summary="Gets list of courses with students and teacher",
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK"
+     *     )
+     * )
+     */
+    function getCoursesWithStudentsAndTeacher(Request $request) {
+        $courses = lt_course::with('students', 'teacher')->get();
+        return response()->json($courses);
+    }
     /**
      * @OA\Post(
      *     path="/api/module/lt_case/create",
@@ -351,7 +365,7 @@ class ApiController extends Controller
             SELECT last_name, first_name, id_number, id_number_status
             FROM lt_customer
             ORDER BY last_name
-SQL);
+        SQL);
         return response()->json($results);
     }
 
